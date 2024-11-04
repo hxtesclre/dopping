@@ -1,6 +1,12 @@
 package net.fabricmc.example.module;
 
+import net.fabricmc.example.module.Setting.Setting;
 import net.minecraft.client.MinecraftClient;
+
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class Mod {
     private String name;
@@ -10,6 +16,8 @@ public class Mod {
     public Category category;
     private boolean enabled;
 
+    private List<Setting> settings = new ArrayList<>();
+
     protected MinecraftClient mc = MinecraftClient.getInstance();
 
     public Mod(String name, String description, Category category) {
@@ -17,6 +25,18 @@ public class Mod {
         this.displayName = name;
         this.description = description;
         this.category = category;
+    }
+
+    public List<Setting> getSettings() {
+        return settings;
+    }
+
+    public void addSetting(Setting setting){
+        settings.add(setting);
+    }
+
+    public void addSettings(Setting...settings){
+        for (Setting setting : settings) addSetting(setting);
     }
 
     public void toggle() {

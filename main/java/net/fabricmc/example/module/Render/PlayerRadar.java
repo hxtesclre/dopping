@@ -2,57 +2,78 @@ package net.fabricmc.example.module.Render;
 
 import net.fabricmc.example.module.Mod;
 import net.fabricmc.example.module.Wrapper;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 
-public class PlayerRadar extends Mod {
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+public class PlayerRadar extends Mod implements HudRenderCallback {
+    private Set<UUID> realPlayers = new HashSet<>();
+
     public PlayerRadar() {
         super("PlayerRadar", "Allows you to see near players", Category.RENDER);
         this.setKey(GLFW.GLFW_KEY_P);
+        HudRenderCallback.EVENT.register(this);
     }
 
-    private void onRenderGameOverlay(MatrixStack matrices, float tickDelta) {
+    @Override
+    public void onHudRender(MatrixStack matrices, float tickDelta) {
+        if (!this.isEnabled()) {
+            return;
+        }
+
         MinecraftClient client = Wrapper.INSTANCE;
         if (client.world != null && client.player != null) {
-            int y = 100; // Измените начальное значение Y
-            for (PlayerEntity e : Wrapper.getPlayersList()) {
-                if (e != client.player) {
+            int y = 10;
+            for (Entity e : client.world.getPlayers()) {
+                if (e instanceof PlayerEntity && e != client.player && realPlayers.contains(e.getUuid())) {
+                    PlayerEntity player = (PlayerEntity) e;
                     float range = client.player.distanceTo(e);
-                    float health = e.getHealth();
+                    float health = player.getHealth();
 
-                    String healthStr = health >= 12.0 ? String.format(Formatting.GREEN + "[%.1f]", health) :
-                            health >= 4.0 ? String.format(Formatting.GOLD + "[%.1f]", health) :
-                                    String.format(Formatting.RED + "[%.1f]", health);
+                    String healthStr = health >= 12.0 ? String.format("§2[%.1f]", health) :
+                            health >= 4.0 ? String.format("§6[%.1f]", health) :
+                                    String.format("§4[%.1f]", health);
 
-                    String name = e.getGameProfile().getName();
-                    String displayStr = name + " " + healthStr + Formatting.GRAY + " [" + String.format("%.1f", range) + "]";
+                    String name = player.getGameProfile().getName();
+                    if (name.contains("§") || name.length() > 16) {
+                        continue;
+                    }
+                    String displayStr = name + " " + healthStr + " §7[" + String.format("%.1f", range) + "]";
 
-                    int color = e.isInvisible() ? 0x9B9B9B : 0xFFFFFF;
-                    client.textRenderer.draw(matrices, displayStr, 10, y, color); // Переместите текст немного вправо
+                    int color = player.isInvisible() ? 0x9B9B9B : 0xFFFFFF;
+                    client.textRenderer.draw(matrices, displayStr, 10, y, color);
                     y += 12;
                 }
             }
         }
     }
 
-
-
-
     @Override
     public void onTick() {
-        // Проверяем, включен ли модуль, и вызываем onRenderGameOverlay, если включен
         if (this.isEnabled()) {
-            onRenderGameOverlay(new MatrixStack(), 0);
+            MinecraftClient client = Wrapper.INSTANCE;
+            if (client.world != null && client.player != null) {
+                realPlayers = client.getNetworkHandler().getPlayerList().stream()
+                        .map(PlayerListEntry::getProfile)
+                        .map(profile -> profile.getId())
+                        .collect(Collectors.toSet());
+            }
         }
         super.onTick();
     }
 
     @Override
     public void onDisable() {
-        // Логика для отключения, если необходимо
+        realPlayers.clear();
         super.onDisable();
     }
 }
