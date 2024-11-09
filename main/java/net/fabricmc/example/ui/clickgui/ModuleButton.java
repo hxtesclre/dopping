@@ -42,6 +42,7 @@ public class ModuleButton {
             } else if (setting instanceof NumberSetting) {
                 components.add(new Slider((NumberSetting) setting, this, setOffset));
             }
+            setOffset += parent.height;
         }
     }
 
@@ -53,10 +54,11 @@ public class ModuleButton {
         int textOffset = ((parent.height / 2) - parent.mc.textRenderer.fontHeight / 2);
         parent.mc.textRenderer.drawWithShadow(matrices, module.getName(), parent.x + textOffset, parent.y + offset + textOffset, module.isEnabled() ? Color.red.getRGB() : -1);
 
-        for(Component component : components){
-            component.render(matrices,mouseX, mouseY, delta);
+        if(extended) {
+            for(Component component : components){
+                component.render(matrices,mouseX, mouseY, delta);
+            }
         }
-
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
@@ -69,10 +71,11 @@ public class ModuleButton {
             }
         }
 
-        for(Component component : components){
-            component.mouseClicked(mouseX, mouseY, button);
+        if (extended) {
+            for (Component component : components) {
+                component.mouseClicked(mouseX, mouseY, button);
+            }
         }
-
     }
 
     public void mouseReleased(double mouseX, double mouseY, int button) {

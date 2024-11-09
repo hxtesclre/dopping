@@ -15,6 +15,7 @@ public class HUD {
         renderArrayList(matricies);
     }
 
+
     public static void renderArrayList(MatrixStack matricies){
         int index = 0;
         int sWidth = mc.getWindow().getScaledWidth();

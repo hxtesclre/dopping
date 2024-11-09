@@ -5,6 +5,7 @@ import net.fabricmc.example.module.Setting.BooleanSetting;
 import net.fabricmc.example.module.Setting.ModeSetting;
 import net.fabricmc.example.module.Setting.NumberSetting;
 import org.lwjgl.glfw.GLFW;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
 public class Flight extends Mod {
 
@@ -20,14 +21,27 @@ public class Flight extends Mod {
 
     @Override
     public void onTick() {
-        mc.player.abilities.allowFlying = true;
+        if (mc.player != null) {
+            mc.player.abilities.allowFlying = true;
+            mc.player.abilities.setFlySpeed(speed.getValueFloat());
+
+            // Добавляем обработку пакетов для предотвращения урона при приземлении
+            if (mc.player.fallDistance > 2.5 && !mc.player.isOnGround()) {
+                double x = mc.player.getX();
+                double y = mc.player.getY();
+                double z = mc.player.getZ();
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionOnly(x, y - 0.1, z, true));
+            }
+        }
         super.onTick();
-        mc.player.abilities.setFlySpeed(speed.getValueFloat());
     }
 
     @Override
     public void onDisable() {
-        mc.player.abilities.allowFlying = false;
+        if (mc.player != null) {
+            mc.player.abilities.allowFlying = false;
+            mc.player.abilities.flying = false;
+        }
         super.onDisable();
     }
 }

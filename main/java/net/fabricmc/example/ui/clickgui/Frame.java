@@ -21,7 +21,7 @@ public class Frame {
     protected MinecraftClient mc = MinecraftClient.getInstance();
 
     public Frame(Mod.Category category, int x, int y, int width, int height){
-        this.category = category; // Не забываем инициализировать category
+        this.category = category;
         this.x = x;
         this.y = y;
         this.width = width;
@@ -38,29 +38,29 @@ public class Frame {
         }
     }
 
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta){
+        DrawableHelper.fill(matrices, x, y, x + width, y + height, Color.red.getRGB());
 
-    public void render(MatrixStack matricies, int mouseX, int mouseY, float delta){
-       DrawableHelper.fill(matricies, x, y, x + width, y + height, Color.red.getRGB());
+        int textOffset = ((height / 2) - mc.textRenderer.fontHeight / 2);
+        mc.textRenderer.drawWithShadow(matrices, category.name, x + textOffset, y + textOffset, -1);
+        mc.textRenderer.drawWithShadow(matrices, extended ? "-" : "+", x + width - textOffset - 2 - mc.textRenderer.getWidth("+"), y + textOffset, -1);
 
-       int offset = ((height / 2) - mc.textRenderer.fontHeight / 2);
-       mc.textRenderer.drawWithShadow(matricies, category.name, x + offset, y + offset, -1);
-       mc.textRenderer.drawWithShadow(matricies, extended ? "-" : "+", x + width - offset - 2 - mc.textRenderer.getWidth("+"), y + offset, -1);
+        if(extended) {
+            for (ModuleButton button : buttons) {
+                button.render(matrices, mouseX, mouseY, delta);
+            }
+        }
+    }
 
-       if(extended) {
-           for (ModuleButton button : buttons) {
-               button.render(matricies, mouseX, mouseY, delta);
-           }
-       }
-   }
-
-   public void mouseClicked(double mouseX, double mouseY, int button){
-        if(isHovered(mouseX, mouseY) && button == 0){
+    public void mouseClicked(double mouseX, double mouseY, int button){
+        if(isHovered(mouseX, mouseY)){
             if (button == 0) {
                 dragging = true;
                 dragX = (int) (mouseX - x);
                 dragY = (int) (mouseY - y);
             } else if (button == 1){
                 extended = !extended;
+                updateButton(); // Обновляем кнопки при изменении состояния extended
             }
         }
 
@@ -69,15 +69,14 @@ public class Frame {
                 mb.mouseClicked(mouseX, mouseY, button);
             }
         }
+    }
 
-   }
+    public void mouseReleased(double mouseX, double mouseY, int button){
+        if(button == 0 && dragging) dragging = false;
 
-   public void mouseReleased(double mouseX,  double mouseY, int button){
-        if(button == 0 && dragging == true) dragging = false;
-   }
-
-    public MinecraftClient getMc() {
-        return mc;
+        for(ModuleButton mb : buttons){
+            mb.mouseReleased(mouseX, mouseY, button);
+        }
     }
 
     public boolean isHovered(double mouseX, double mouseY){
@@ -95,7 +94,7 @@ public class Frame {
         int offset = height;
 
         for (ModuleButton button : buttons){
-            button.offset = height;
+            button.offset = offset; // Исправлено: используем offset
             offset += height;
 
             if (button.extended){
@@ -104,5 +103,9 @@ public class Frame {
                 }
             }
         }
+    }
+
+    public MinecraftClient getMc() {
+        return mc;
     }
 }

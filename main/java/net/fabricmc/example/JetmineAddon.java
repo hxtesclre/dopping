@@ -2,6 +2,7 @@ package net.fabricmc.example;
 
 import net.fabricmc.example.module.Mod;
 import net.fabricmc.example.module.ModuleManager;
+import net.fabricmc.example.ui.AnimatedHUD;
 import net.fabricmc.example.ui.clickgui.ClickGUI;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +16,7 @@ public class JetmineAddon implements ModInitializer {
 	public static final Logger logger = LogManager.getLogger(JetmineAddon.class);
 
 private MinecraftClient mc = MinecraftClient.getInstance();
+private AnimatedHUD animatedHUD;
 
 	@Override
 	public void onInitialize() {

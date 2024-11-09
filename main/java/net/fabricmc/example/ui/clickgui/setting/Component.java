@@ -2,6 +2,7 @@ package net.fabricmc.example.ui.clickgui.setting;
 
 import net.fabricmc.example.module.Setting.Setting;
 import net.fabricmc.example.ui.clickgui.ModuleButton;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class Component {
@@ -9,6 +10,8 @@ public class Component {
     public Setting setting;
     public ModuleButton parent;
     public int offset;
+
+    protected MinecraftClient mc = MinecraftClient.getInstance();
 
     public Component(Setting setting, ModuleButton parent, int offset) {
         this.setting = setting;

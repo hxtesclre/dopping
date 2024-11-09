@@ -18,12 +18,11 @@ public class CheckBox extends Component {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        DrawableHelper.fill(matrices, parent.parent.x, parent.parent.y + offset, parent.parent.x + parent.parent.width, parent.parent.y + offset + parent.parent.height, new Color(0, 0, 0, 160).getRGB());
-        if (isHovered(mouseX, mouseY)) {
-            DrawableHelper.fill(matrices, parent.parent.x, parent.parent.y + offset, parent.parent.x + parent.parent.width, parent.parent.y + offset + parent.parent.height, new Color(0, 0, 0, 200).getRGB());
-        }
-        int textOffset = (parent.parent.height / 2 - parent.parent.getMc().textRenderer.fontHeight / 2);
-        parent.parent.getMc().textRenderer.drawWithShadow(matrices, boolSet.getName(), parent.parent.x + textOffset, parent.parent.y + offset + textOffset, boolSet.isEnabled() ? Color.GREEN.getRGB() : -1);
+        DrawableHelper.fill(matrices, parent.parent.x, parent.parent.y + parent.offset + offset, parent.parent.x + parent.parent.width, parent.parent.y + parent.offset + offset + parent.parent.height, new Color(0, 0, 0, 160).getRGB());
+
+        int textOffset = ((parent.parent.height / 2) - mc.textRenderer.fontHeight / 2);
+        mc.textRenderer.drawWithShadow(matrices, boolSet.getName() + ": " + boolSet.isEnabled(),  parent.parent.x + textOffset, parent.parent.y + parent.offset + offset + textOffset, -1);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override
@@ -36,6 +35,6 @@ public class CheckBox extends Component {
 
     @Override
     public boolean isHovered(double mouseX, double mouseY) {
-        return mouseX > parent.parent.x && mouseX < parent.parent.x + parent.parent.width && mouseY > parent.parent.y + offset && mouseY < parent.parent.y + offset + parent.parent.height;
+        return mouseX > parent.parent.x && mouseX < parent.parent.x + parent.parent.width && mouseY > parent.parent.y + parent.offset + offset && mouseY < parent.parent.y + parent.offset + offset + parent.parent.height;
     }
 }

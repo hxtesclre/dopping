@@ -1,5 +1,8 @@
 package net.fabricmc.example.module;
 
+import net.fabricmc.example.module.Movement.AutoWalk;
+import net.fabricmc.example.module.Movement.NoFall;
+import net.fabricmc.example.module.Render.ParticleTracker;
 import net.fabricmc.example.module.Render.PlayerRadar;
 import net.fabricmc.example.module.Movement.Flight;
 import net.fabricmc.example.module.Movement.Sprint;
@@ -43,5 +46,8 @@ public class ModuleManager {
         modules.add(new Flight());
         modules.add(new Sprint());
         modules.add(new PlayerRadar()); // Добавление модуля PlayerRadar
+        modules.add(new NoFall());
+        modules.add(new AutoWalk());
+        modules.add(new ParticleTracker());
     }
 }

@@ -12,7 +12,8 @@
     "InGameHudMixin",
     "MultiplayerUnlockMixin",
     "ChatUnlockMixin",
-    "UserMixin"
+    "UserMixin",
+    "ParticleManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
